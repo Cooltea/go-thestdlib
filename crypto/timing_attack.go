@@ -10,9 +10,9 @@ import (
 )
 
 var (
-    password = flag.String("password", "secret", "The password to try and guess")
-    letters  = []byte("abcdefghijklmnopqrstuvwxyz")
-    compare  = flag.String("compare", "broken", "The comparison function to use. Must be one of constant or broken (default)")
+    password   = flag.String("password", "secret", "The password to try and guess")
+    characters = flag.String("characters", "abcdefghijklmnopqrstuvwxyz", "The set of characters to use")
+    compare    = flag.String("compare", "broken", "The comparison function to use. Must be one of constant or broken (default)")
 )
 
 type TestRun struct {
@@ -54,7 +54,7 @@ func Crack(password []byte, comp Compare) []byte {
     guess := make([]byte, n)
     for index := range password {
         times := make(Times, 0)
-        for _, letter := range letters {
+        for _, letter := range []byte(*characters) {
             guess[index] = letter
             result := T.Benchmark(func(b *T.B) {
                 for i := 0; i < b.N; i++ {
@@ -90,8 +90,10 @@ func main() {
     start := time.Now()
     switch *compare {
     case "broken":
+        log.Println("using broken compare function")
         guess = BrokenCrack(pw)
     case "constant":
+        log.Println("using constant time compare function")
         guess = ConstantTimeCrack(pw)
     default:
         log.Fatalf("%s is not a valid compare function. Must be one of broken or constant")
