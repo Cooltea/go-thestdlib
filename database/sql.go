@@ -15,9 +15,17 @@ type Show struct {
     Name, Country string
 }
 
+func openSqlite() (*sql.DB, err) {
+    return sql.Open("sqlite3", "go-thestdlib.db")
+}
+
+func openPostgres() (*sql.DB, err) {
+    return sql.Open("postgres", "user=bob password=secret host=1.2.3.4 port=5432 dbname=mydb sslmode=verify-full")
+}
+
 func openDB() *sql.DB {
-    db, err := sql.Open("sqlite3", "go-thestdlib.db")
-    // db, err := sql.Open("postgres", "user=bob password=secret host=1.2.3.4 port=5432 dbname=mydb sslmode=verify-full")
+    db, err := openSqlite()
+    // db, err := openPostgres()
     if err != nil {
         log.Fatalf("failed opening database: %s", err)
     }
@@ -43,9 +51,8 @@ func createTable(db *sql.DB) {
 }
 
 func insertRow(db *sql.DB) {
-    res, err := db.Exec("INSERT INTO shows (name, country) VALUES (?, ?)", "Nöjesmaskinen", "SE")
     // For postgres we use $1 and $2 instead of ?
-    // res, err := db.Exec("INSERT INTO shows (name, country) VALUES ($1, $2)", "Nöjesmaskinen", "SE")
+    res, err := db.Exec("INSERT INTO shows (name, country) VALUES (?, ?)", "Nöjesmaskinen", "SE")
     if err != nil {
         log.Fatalf("failed inserting Swedish show: %s", err)
     } else {
@@ -79,7 +86,6 @@ func insertRows(db *sql.DB) {
     }
 
     stmt, err := tx.Prepare("INSERT INTO shows (name, country) VALUES (?, ?)")
-    // stmt, err := tx.Prepare("INSERT INTO shows (name, country) VALUES ($1, $2)")
     if err != nil {
         log.Fatalf("failed preparing statement: %s", err)
     }
@@ -119,7 +125,6 @@ func queryCount(db *sql.DB) {
 
 func queryRow(db *sql.DB) {
     row := db.QueryRow("SELECT * FROM shows WHERE country = ? LIMIT 1", "CA")
-    // row := db.QueryRow("SELECT * FROM shows WHERE country = $1 LIMIT 1", "CA")
     show := Show{}
     if err := row.Scan(&show.Name, &show.Country); err != nil {
         log.Printf("failed scanning single row: %s", err)
@@ -131,7 +136,6 @@ func queryRow(db *sql.DB) {
 func queryRows(db *sql.DB) {
     name := "Top Gear"
     rows, err := db.Query("SELECT * FROM shows WHERE name = ?", name)
-    // rows, err := db.Query("SELECT * FROM shows WHERE name = $1", name)
     if err != nil {
         log.Fatalf("failed querying multiple rows: %s", err)
     }
