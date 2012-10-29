@@ -137,9 +137,21 @@ func printHeader(fh *macho.FileHeader) {
     }
 }
 
+func printSection(s *macho.Section) {
+    log.Printf("section %s", s.Name)
+    log.Printf("\tSeg %s", s.Seg)
+    log.Printf("\tAddr %#x", s.Addr)
+    log.Printf("\tSize %d", s.Size)
+    log.Printf("\tOffset %d", s.Offset)
+    log.Printf("\tAlign %d", s.Align)
+    log.Printf("\tReloff %s", s.Seg)
+    log.Printf("\tNreloc %d", s.Nreloc)
+    log.Printf("\tFlags %b", s.Flags)
+}
+
 func printSections(sections []*macho.Section) {
     for _, section := range sections {
-        log.Printf("%v", section)
+        printSection(section)
     }
 }
 
