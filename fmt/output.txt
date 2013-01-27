@@ -1,3 +1,0 @@
-Fprint: {8 true This is my boomstick!} 221 false 5.1 (3+1i)batmanFprintln: {8 true This is my boomstick!} 1 false 5.1 (3+1i) batman
-Fprintf: 11011101 0xdd false {8 true This is my boomstick!} struct { Count int; Debug bool; Notes string } 1.380000e+06
-6
